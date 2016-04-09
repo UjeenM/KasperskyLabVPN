@@ -1,0 +1,76 @@
+---
+
+- hosts: localhost
+  vars:
+    sac_url: 'http://dms.aladdin-rd.ru/dms/28e401cf3cf47249ca59fd59fb371af3/2016/12/31/agorin/sac_9_0_43_linux.zip'
+
+  tasks:
+
+    - name: install required packages
+      become: true
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - opensc
+        - nss-tools
+
+    - name: download SAC
+      become: false
+      get_url:
+        url: "{{ sac_url }}"
+        dest: /tmp/sac.zip
+
+    # - name: unarchive downloaded zip
+    #   unarchive:
+    #     src: "{{ sac_url }}"
+    #     dest: /tmp
+    #     copy: no
+
+    - name: unarchive downloaded zip
+      command: unzip /tmp/sac.zip
+      args:
+        chdir: /tmp/
+        creates: "/tmp/Linux_Checksum.txt"
+      tags:
+        - unarchive
+
+    - name: mount iso to /mnt
+      become: true
+      mount:
+        name: /mnt/sac
+        src: "{{ item }}"
+        fstype: iso9660
+        opts: ro
+        state: mounted
+      with_fileglob:
+        - /tmp/*.iso
+
+    - name: import GPG key
+      become: true
+      rpm_key:
+        state: present
+        key: /mnt/sac/Installation/Core/RPM/x64/RPM-GPG-KEY-SafenetAuthenticationClient
+
+    - name: install packages
+      become: true
+      package:
+        name: "{{ item }}"
+        state: present
+      with_fileglob:
+        - /mnt/sac/Installation/Standard/RPM/{{ "x" + ansible_architecture.rpartition('_')[2] }}/SafenetAuthenticationClient-*.x86_64.rpm
+        - /mnt/sac/Installation/Core/RPM/{{ "x" + ansible_architecture.rpartition('_')[2] }}/SafenetAuthenticationClient-core-*.x86_64.rpm
+        - "/mnt/sac/Installation/x32 Compatibility/RPM/SAC-32-CompatibilityPack-*.x86_64.rpm"
+      tags:
+        - rpms
+
+    - name: umount iso from /mnt
+      become: true
+      mount:
+        name: /mnt/sac
+        src: "{{ item }}"
+        fstype: iso9660
+        opts: ro
+        state: absent
+      with_fileglob:
+        - /tmp/*.iso

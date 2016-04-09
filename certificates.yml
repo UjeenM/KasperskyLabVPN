@@ -1,0 +1,24 @@
+---
+
+- hosts: localhost
+  tasks:
+
+    - name: create directory to store certificates in
+      become: false
+      file:
+        path: "{{ lookup('env','HOME') }}/KasperskyLab"
+        state: directory
+
+    - name: fetch Kaspersky Lab certificates
+      become: false
+      get_url:
+        url: https://www.kaspersky.com/downloads/keys/certificates.zip
+        dest: "{{ lookup('env','HOME') }}/KasperskyLab/KL-certificates.zip"
+
+    - name: unarchive Kaspersky Lab certificates
+      become: false
+      unarchive:
+        src: "{{ lookup('env','HOME') }}/KasperskyLab/KL-certificates.zip"
+        dest: "{{ lookup('env','HOME') }}/KasperskyLab"
+        copy: no
+        creates: "{{ lookup('env','HOME') }}/KasperskyLab/ExtCA.cer"
