@@ -6,7 +6,7 @@ This is WIP
 - sudo without password prompt (use appropriate ansible options otherwise)
 
 ### Install SafeNet Authentication Client on Fedora 23
-- request the software using http://www.aladdin-rd.ru/support/request.php
+- request the software using http://www.aladdin-rd.ru/support/request.php or use default url in SafeNet.yml (until it expires)
 - install SafeNet Authentication Client with  
   `ansible-playbook SafeNet.yml` 
 - check with
