@@ -9,8 +9,8 @@ This is WIP
 - request the software using http://www.aladdin-rd.ru/support/request.php or use default url in SafeNet.yml (until it expires)
 - install SafeNet Authentication Client with  
   `ansible-playbook SafeNet.yml` 
-- check with
-  `pkcs11-tool --module /usr/lib64/libeTPkcs11.so -L`
+- check with  
+  `sudo pkcs11-tool --module /usr/lib64/libeTPkcs11.so -L`
 
 ### Setup certificates
-`ansible-playbook certificates.yml
+`ansible-playbook certificates.yml`
