@@ -1,9 +1,12 @@
 This is WIP  
 
 ## Requirements
-- Ansible 2.0
+- Ansible 2.0  
 - Fedora 23 (x86_64)
 - sudo without password prompt (use appropriate ansible options otherwise)
+
+### Install Ansible 2.0
+`dnf --enablerepo updates-testing install ansible python-dnf libselinux-python -y`
 
 ### Install SafeNet Authentication Client on Fedora 23
 - request the software using http://www.aladdin-rd.ru/support/request.php or use default url in SafeNet.yml (until it expires)
