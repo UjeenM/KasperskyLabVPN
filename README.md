@@ -10,7 +10,7 @@ This is WIP
 - install SafeNet Authentication Client with  
   `ansible-playbook SafeNet.yml` 
 - check with  
-  `pkcs11-tool --module /usr/lib64/libeTPkcs11.so -L`
+  `sudo pkcs11-tool --module /usr/lib64/libeTPkcs11.so -L`
 
 ### Setup certificates
 `ansible-playbook certificates.yml`
