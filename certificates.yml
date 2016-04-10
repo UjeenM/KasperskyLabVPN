@@ -1,24 +1,57 @@
 ---
 
 - hosts: localhost
+  become: false
+  vars:
+    certificates_path: "{{ lookup('env','HOME') }}/KasperskyLab"
   tasks:
 
     - name: create directory to store certificates in
-      become: false
       file:
-        path: "{{ lookup('env','HOME') }}/KasperskyLab"
+        path: "{{ certificates_path }}"
         state: directory
 
     - name: fetch Kaspersky Lab certificates
-      become: false
       get_url:
         url: https://www.kaspersky.com/downloads/keys/certificates.zip
-        dest: "{{ lookup('env','HOME') }}/KasperskyLab/KL-certificates.zip"
+        dest: "{{ certificates_path }}/KL-certificates.zip"
 
     - name: unarchive Kaspersky Lab certificates
-      become: false
       unarchive:
-        src: "{{ lookup('env','HOME') }}/KasperskyLab/KL-certificates.zip"
-        dest: "{{ lookup('env','HOME') }}/KasperskyLab"
+        src: "{{ certificates_path }}/KL-certificates.zip"
+        dest: "{{ certificates_path }}"
         copy: no
-        creates: "{{ lookup('env','HOME') }}/KasperskyLab/ExtCA.cer"
+        creates: "{{ certificates_path }}/ExtCA.cer"
+
+    - name: find firefox profile
+      command: find {{ lookup('env','HOME') }}/.mozilla/firefox -type f -name 'cert8.db' -printf "%h\n"
+      register: cert_dir
+      ignore_errors: true
+
+    - fail: msg="Please start Firefox to create profile. Then restart this playbook"
+      when: cert_dir.stdout == ""
+
+    - debug: var=cert_dir.stdout_lines
+
+    - name: import Kaspersky Lab External Services Root CA
+      command: certutil -A -n "Kaspersky Lab External Services Root CA" -t "C,C,C" -i ExtCA.cer -d {{ cert_dir.stdout_lines [0] }}
+      args:
+        chdir: "{{ certificates_path }}"
+
+    - name: get list of the other certificates
+      command: find {{ certificates_path }} -type f -name 'kasperskylab*.cer'
+      register: certificates
+      tags:
+        - certs
+
+    - debug: var=certificates.stdout_lines
+      tags:
+        - certs
+
+    - name: import the rest of certificates
+      shell: certutil -A -n "$(openssl x509 -noout -subject -in {{ item }} | awk -F 'CN=' '{print $2}')" -t "C,C,C" -i {{ item }} -d {{ cert_dir.stdout_lines [0] }}
+      args:
+        chdir: "{{ certificates_path }}"
+      with_items: "{{ certificates.stdout_lines }}"
+      tags:
+        - certs
