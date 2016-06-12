@@ -1,5 +1,3 @@
-This is WIP  
-
 ## Requirements
 - Ansible 2.0  
 - Fedora 23 (x86_64)
@@ -17,3 +15,6 @@ This is WIP
 
 ### Setup certificates
 `ansible-playbook certificates.yml`
+
+### Setup ppp
+`ansible-playbook ppp.yml.yml`

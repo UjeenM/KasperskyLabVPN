@@ -1,0 +1,13 @@
+pty "pptp vpn.kaspersky.com --nolaunchpppd"
+name KL\\{{ username }}
+remotename vpn.kaspersky.com
+require-mppe-128
+file /etc/ppp/options.pptp
+ipparam klvpn
+mru 1400
+updetach
+usepeerdns
+defaultroute
+ca {{ lookup('env','HOME') }}/KasperskyLab/kasperskylabshqca.cer
+cert pkcs11:{{ token_id.stdout }}
+key pkcs11:{{ token_id.stdout }}

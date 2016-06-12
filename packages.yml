@@ -1,0 +1,14 @@
+---
+
+- hosts: localhost
+  become: true
+  tasks:
+    - name: install required packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - opensc
+        - openct
+        - nss-tools
+        - engine_pkcs11-0.1.8-12.fc23

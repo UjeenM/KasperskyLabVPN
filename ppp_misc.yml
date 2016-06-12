@@ -1,0 +1,19 @@
+---
+
+- hosts: localhost
+  gather_facts: false
+  become: true
+
+  tasks:
+
+    - name: comment refuse-eap in /etc/ppp/options.pptp
+      lineinfile:
+        dest: /etc/ppp/options.pptp
+        regexp: "refuse-eap"
+        state: absent
+      tags: pptp
+
+    - name: render /etc/ppp/openssl.cnf
+      template:
+        src: openssl.cnf.j2
+        dest: /etc/ppp/openssl.cnf

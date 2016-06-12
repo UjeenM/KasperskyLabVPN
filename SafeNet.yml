@@ -1,19 +1,12 @@
 ---
 
+- include: packages.yml
+
 - hosts: localhost
   vars:
     sac_url: 'http://dms.aladdin-rd.ru/dms/28e401cf3cf47249ca59fd59fb371af3/2016/12/31/agorin/sac_9_0_43_linux.zip'
 
   tasks:
-
-    - name: install required packages
-      become: true
-      package:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - opensc
-        - nss-tools
 
     - name: download SAC
       become: false

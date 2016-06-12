@@ -1,0 +1,23 @@
+---
+
+- hosts: localhost
+  become: true
+
+  vars_prompt:
+
+    - name: "username"
+      prompt: "Specify your domain username"
+      private: no
+
+  tasks:
+
+    - name: obtaind ID from the token
+      shell: pkcs11-tool --module /usr/lib64/libeTPkcs11.so -O 2>/dev/null | grep ID | cut -d ':' -f2 | sed 's/\s//g'
+      register: token_id
+
+    - name: render /etc/ppp/peers/klvpn
+      template:
+        src: klvpn.j2
+        dest: /etc/ppp/peers/klvpn
+
+- include: ppp_misc.yml
