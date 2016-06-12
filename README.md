@@ -17,4 +17,4 @@
 `ansible-playbook certificates.yml`
 
 ### Setup ppp
-`ansible-playbook ppp.yml.yml`
+`ansible-playbook ppp.yml`
