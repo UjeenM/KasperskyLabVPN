@@ -3,47 +3,29 @@
 - include: packages.yml
 
 - hosts: localhost
+  become: false
+  connection: local
   vars:
-    sac_url: 'http://dms.aladdin-rd.ru/dms/28e401cf3cf47249ca59fd59fb371af3/2016/12/31/agorin/sac_9_0_43_linux.zip'
+    sac_file_path: "{{ lookup('env','HOME') }}/Downloads/SAC_9_1_Linux.zip"
+    tmp_path: /tmp/SAC_9_1_Linux
 
   tasks:
 
-    - name: download SAC
-      become: false
-      get_url:
-        url: "{{ sac_url }}"
-        dest: /tmp/sac.zip
-
-    # - name: unarchive downloaded zip
-    #   unarchive:
-    #     src: "{{ sac_url }}"
-    #     dest: /tmp
-    #     copy: no
-
     - name: unarchive downloaded zip
-      command: unzip /tmp/sac.zip
+      command: unzip "{{ sac_file_path }}"
       args:
         chdir: /tmp/
-        creates: "/tmp/Linux_Checksum.txt"
+        creates: "{{ tmp_path }}"
       tags:
         - unarchive
-
-    - name: mount iso to /mnt
-      become: true
-      mount:
-        name: /mnt/sac
-        src: "{{ item }}"
-        fstype: iso9660
-        opts: ro
-        state: mounted
-      with_fileglob:
-        - /tmp/*.iso
 
     - name: import GPG key
       become: true
       rpm_key:
         state: present
-        key: /mnt/sac/Installation/Core/RPM/x64/RPM-GPG-KEY-SafenetAuthenticationClient
+        key: "{{ tmp_path }}/Installation/Core/RPM/RPM-GPG-KEY-SafenetAuthenticationClient"
+      tags:
+        - import
 
     - name: install packages
       become: true
@@ -51,19 +33,8 @@
         name: "{{ item }}"
         state: present
       with_fileglob:
-        - /mnt/sac/Installation/Standard/RPM/{{ "x" + ansible_architecture.rpartition('_')[2] }}/SafenetAuthenticationClient-*.x86_64.rpm
-        - /mnt/sac/Installation/Core/RPM/{{ "x" + ansible_architecture.rpartition('_')[2] }}/SafenetAuthenticationClient-core-*.x86_64.rpm
-        - "/mnt/sac/Installation/x32 Compatibility/RPM/SAC-32-CompatibilityPack-*.x86_64.rpm"
+        - "{{ tmp_path }}/Installation/Standard/RPM/SafenetAuthenticationClient-*.{{ ansible_architecture }}.rpm"
+        - "{{ tmp_path }}/Installation/Core/RPM/SafenetAuthenticationClient-core-*.{{ ansible_architecture }}.rpm"
+        - "{{ tmp_path }}/Installation/x32 Compatibility/RPM/SAC-32-CompatibilityPack-*.x86_64.rpm"
       tags:
         - rpms
-
-    - name: umount iso from /mnt
-      become: true
-      mount:
-        name: /mnt/sac
-        src: "{{ item }}"
-        fstype: iso9660
-        opts: ro
-        state: absent
-      with_fileglob:
-        - /tmp/*.iso
