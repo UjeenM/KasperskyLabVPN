@@ -1,8 +1,7 @@
 ---
 
 - hosts: localhost
-  become: true
-
+  become: false
   vars_prompt:
 
     - name: "username"
@@ -16,6 +15,7 @@
       register: token_id
 
     - name: render /etc/ppp/peers/klvpn
+      become: true
       template:
         src: klvpn.j2
         dest: /etc/ppp/peers/klvpn
