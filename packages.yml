@@ -9,6 +9,17 @@
         state: present
       with_items:
         - opensc
-        - openct
         - nss-tools
-        - engine_pkcs11-0.1.8-12.fc23
+        - http://mirror.yandex.ru/fedora/linux/releases/23/Everything/x86_64/os/Packages/e/engine_pkcs11-0.1.8-12.fc23.x86_64.rpm
+
+    - name: remove freaking gvfs-smb
+      package:
+        name: gvfs-smb
+        state: absent
+
+    - name: install python-firewall on Fedora 24
+      package:
+        name: python-firewall
+        state: present
+      when: ansible_distribution_major_version == "24"
+      tags: firewalld
