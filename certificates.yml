@@ -13,7 +13,7 @@
 
     - name: fetch Kaspersky Lab certificates
       get_url:
-        url: https://www.kaspersky.com/downloads/keys/certificates.zip
+        url: https://vpnhelp.kaspersky.ru/Applications/certificates.zip
         dest: "{{ certificates_path }}/KL-certificates.zip"
 
     - name: unarchive Kaspersky Lab certificates

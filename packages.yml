@@ -17,9 +17,8 @@
         name: gvfs-smb
         state: absent
 
-    - name: install python-firewall on Fedora 24
+    - name: install python-firewall
       package:
         name: python-firewall
         state: present
-      when: ansible_distribution_major_version == "24"
       tags: firewalld

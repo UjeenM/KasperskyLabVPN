@@ -11,7 +11,7 @@
   tasks:
 
     - name: obtaind ID from the token
-      shell: pkcs11-tool --module /usr/lib64/libeTPkcs11.so -O 2>/dev/null | grep ID | cut -d ':' -f2 | sed 's/\s//g'
+      shell: pkcs11-tool --module /usr/lib64/libeTPkcs11.so -O 2>/dev/null | grep 'ID:' | tail -1 | cut -d ':' -f2 | sed 's/\s//g'
       register: token_id
 
     - name: render /etc/ppp/peers/klvpn

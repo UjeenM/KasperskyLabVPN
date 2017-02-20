@@ -18,3 +18,9 @@
 
 ### Setup ppp
 `ansible-playbook ppp.yml`
+
+Enable GRE traffic:
+`firewall-cmd --permanent --direct --add-rule ipv4 filter INPUT 0 -p gre -j ACCEPT`
+`firewall-cmd --permanent --direct --add-rule ipv6 filter INPUT 0 -p gre -j ACCEPT`
+`firewall-cmd --reload`
+`modprobe nf_conntrack_pptp nf_conntrack_proto_gre`
